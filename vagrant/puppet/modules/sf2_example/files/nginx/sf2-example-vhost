@@ -1,0 +1,38 @@
+server {
+    listen   80; ## listen for ipv4
+
+    server_name  localhost;
+
+    access_log  /var/log/nginx/sf2-example.access.log;
+    error_log  /var/log/nginx/sf2-example.error.log;
+
+    root   /vagrant/web;
+
+    # IMPORTANT: VirtualBox shared folder can't cope with sendfile():
+    #   https://forums.virtualbox.org/viewtopic.php?f=3&t=33201
+    sendfile off;
+
+    location / {
+            index app.php;
+            try_files $uri @rewrite_to_app;
+    }
+
+    location @rewrite_to_app {
+            rewrite ^(.*)$ /app.php/$1 last;
+    }
+ 
+    location ~ ^/(app|app_dev)\.php(/|$) {
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+            fastcgi_buffer_size   128k;
+            fastcgi_buffers   4 256k;
+            fastcgi_busy_buffers_size   256k;
+
+            include fastcgi_params;
+                
+            fastcgi_param   SERVER_PORT      80;
+            fastcgi_param   SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            fastcgi_param   HTTPS            off;
+    }
+}

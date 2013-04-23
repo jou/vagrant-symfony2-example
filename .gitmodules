@@ -1,0 +1,6 @@
+[submodule "vagrant/puppet/modules/composer"]
+	path = vagrant/puppet/modules/composer
+	url = git://github.com/tPl0ch/puppet-composer.git
+[submodule "vagrant/puppet/modules/git"]
+	path = vagrant/puppet/modules/git
+	url = git://github.com/puppetlabs/puppetlabs-git.git
