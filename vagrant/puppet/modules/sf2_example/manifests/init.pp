@@ -2,7 +2,7 @@ class sf2_example {
   stage { 'apt-update': before => Stage['main'] }
   class { 'sf2_example::current_apt_index': stage => 'apt-update' }
   
-  package { ["php5-fpm", "php5-cli", "nginx", "git"]:
+  package { ["php5-fpm", "php5-cli", "nginx"]:
     ensure => installed,
   }
 
@@ -28,11 +28,11 @@ class sf2_example {
     notify => Service["nginx"],
   }
 
-  file { "/etc/php5/conf.d/timezone.ini":
-    ensure => file,
-    content => 'date.timezone = "Europe/Zurich"',
-    notify => Service["php5-fpm"],
-  }
+  #file { "/etc/php5/cli/php.ini":
+  #  ensure => file,
+  #  content => 'date.timezone = "Europe/Madrid"',
+  #  notify => Service["php5-fpm"],
+  #}
 
   # Bind mount sf2 cache and log directories to local directories. We can't
   # put those on the shared folder because firstly, PHP rund under www-data
@@ -67,15 +67,15 @@ class sf2_example {
     cmd => 'install',
     cwd => '/vagrant',
     dev => true,
-    no_scripts => false,
+    # no_scripts => false,
     require => [Package["php5-cli"], Temp_bind_mount["sf2-cache"], Temp_bind_mount["sf2-logs"]]
   }
 
   # Composer runs as root, so if it creates cache entries, the web process can't change them
   exec { "fix-cache-owner":
-    command => "/bin/chown -R www-data:www-data /vagrant/app/cache/*",
+    command => "/bin/chown -R www-data:www-data /vagrant/app/cache/",
     require => Composer::Exec['composer-install'],
-  }
+   }
 
   # We can't use puppet's built in 'mount' resource since that
   # would generate an entry in /etc/fstab. But the target doesn't
