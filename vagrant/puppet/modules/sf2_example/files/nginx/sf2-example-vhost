@@ -22,7 +22,7 @@ server {
     }
  
     location ~ ^/(app|app_dev)\.php(/|$) {
-            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_pass unix:/var/run/php5-fpm.sock;
             fastcgi_split_path_info ^(.+\.php)(/.*)$;
 
             fastcgi_buffer_size   128k;
